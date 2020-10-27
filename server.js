@@ -30,22 +30,12 @@ const Messages = sequelize.define('messages', {
     message: Sequelize.TEXT
 })
 
-
-
-
-
 app.use('/', express.static('frontend'))
 app.use(express.json())
 app.use(express.urlencoded())
 
 
-// app.post('/messages',(req,res) => {
-//     Messages.create(req.body).then((result) => {
-//         res.status(201).json(result)
-//     }).catch((err) => {
-//         res.status(500).send("resource not created")
-//     })
-// })
+
 
 app.post('/messages', async (req,res) => {
     try{
@@ -57,11 +47,6 @@ app.post('/messages', async (req,res) => {
     }
 })
 
-// app.get('/messages', (req,res) => {
-//     Messages.findAll().then((results) => {
-//         res.status(200).json(results)
-//     })
-// })
 
 app.get('/messages', async(req,res) => {
     try {
@@ -73,18 +58,6 @@ app.get('/messages', async(req,res) => {
     }
 })
 
-// app.get('/messages/:id', (req,res) => {
-//     Messages.findByPk(req.params.id).then((result) => {
-//         if(result) {
-//             res.status(200).json(result)
-//         } else {
-//             res.status(404).send('Resource not found')
-//         }
-//     }).catch((err) => {
-//         console.log(err)
-//         res.status(500).send('Database error')
-//     })
-// })
 
 app.get('/messages/:id', async(req,res) => {
     try {
@@ -100,6 +73,65 @@ app.get('/messages/:id', async(req,res) => {
     }
 })
  
+
+
+app.put('/messages/:id', async(req,res) => {
+    try {
+        let result = await Messages.findByPk(req.params.id)
+        if(result) {
+            let message = await result.update(req.body)
+            res.status(201).json(message)
+        } else {
+            res.status(404).send('resource not found')
+        }
+    } catch(err) {
+        res.status(500).send('database error')
+    }
+})
+
+
+app.delete('/messages/:id' , async (req,res) => {
+    try{
+        let message = await Messages.findByPk(req.params.id)
+        if(message) {
+            await message.destroy()
+            res.status(201).send('Deleted')
+        } else {
+            res.status(404).send('resource not found')
+        }
+    } catch(err) {
+        console.log(err)
+        res.status(500).send('database error')
+    }
+})
+
+// app.post('/messages',(req,res) => {
+//     Messages.create(req.body).then((result) => {
+//         res.status(201).json(result)
+//     }).catch((err) => {
+//         res.status(500).send("resource not created")
+//     })
+// })
+
+// app.get('/messages', (req,res) => {
+//     Messages.findAll().then((results) => {
+//         res.status(200).json(results)
+//     })
+// })
+
+// app.get('/messages/:id', (req,res) => {
+//     Messages.findByPk(req.params.id).then((result) => {
+//         if(result) {
+//             res.status(200).json(result)
+//         } else {
+//             res.status(404).send('Resource not found')
+//         }
+//     }).catch((err) => {
+//         console.log(err)
+//         res.status(500).send('Database error')
+//     })
+// })
+
 // app.put('/messages/:id', (req,res)=> {
 //     Messages.findByPk(req.params.id).then((message) => {
 //         if(message) {
@@ -116,20 +148,6 @@ app.get('/messages/:id', async(req,res) => {
 //         res.status(500).send('database error')
 //     })
 // })
-
-app.put('/messages/:id', async(req,res) => {
-    try {
-        let result = await Messages.findByPk(req.params.id)
-        if(result) {
-            let message = await result.update(req.body)
-            res.status(201).json(message)
-        } else {
-            res.status(404).send('resource not found')
-        }
-    } catch(err) {
-        res.status(500).send('database error')
-    }
-})
 
 // app.delete('/messages/:id', (req,res) => {
 //     Messages.findByPk(req.params.id).then((message) => {
@@ -148,19 +166,5 @@ app.put('/messages/:id', async(req,res) => {
 //     })
 // })
 
-app.delete('/messages/:id' , async (req,res) => {
-    try{
-        let message = await Messages.findByPk(req.params.id)
-        if(message) {
-            await message.destroy()
-            res.status(201).send('Deleted')
-        } else {
-            res.status(404).send('resource not found')
-        }
-    } catch(err) {
-        console.log(err)
-        res.status(500).send('database error')
-    }
-})
  
 app.listen(8080)

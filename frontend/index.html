@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Message list</title>
-    </head>
-    <body>
-        <h1>Messages</h1>
-    </body>
-    <div id="content">
-        <table style="width:100%;">
+
+<head>
+    <title>Message list</title>
+</head>
+
+<body>
+    <h1>Messages</h1>
+</body>
+<div id="content">
+    <table style="width:100%;">
         <tr>
             <th>ID</th>
             <th>Subject</th>
-            <th>Name</th> 
+            <th>Name</th>
             <th>Message</th>
             <th>Actions</th>
         </tr>
@@ -26,17 +28,71 @@
             </td>
         </tr>
     </table>
-    
+
     <form>
-      <input type="hidden" name="id" id="id" /><br />
-      Name:<br />
-      <input type="text" name="name" id="name" /><br />
-      Subject:<br />
-      <input type="text" name="subject" id="subject"><br/>
-      Message:<br />
-      <textarea name="message" id="message"></textarea> <br/>
-      <input type="submit" value="Save message">
-      <input type="reset" value="Cancel">
+        <input type="hidden" name="id" id="id" /><br />
+        Name:<br />
+        <input type="text" name="name" id="name" /><br />
+        Subject:<br />
+        <input type="text" name="subject" id="subject"><br />
+        Message:<br />
+        <textarea name="message" id="message"></textarea> <br />
+        <input type="submit" value="Save message">
+        <input type="reset" value="Cancel">
     </form>
+
+    <script type="text/javascript">
+        console.log("Console log javascript")
+
+
+        function reqListener() {
+
+            console.log(this.responseText);
+
+            let data = JSON.parse(this.responseText);
+
+            let htmlContent = `
+            
+            <table style="width:100%;">
+            <tr>
+            <th>ID</th>
+            <th>Subject</th>
+            <th>Name</th> 
+            <th>Message</th>
+            <th>Actions</th>
+            </tr>
+
+            `
+
+            data.forEach(element => {
+                htmlContent += `
+                <tr>
+                <td>${element.id}</td>
+                <td>${element.subject}</td>
+                <td>${element.name}</td>
+                <td>${element.message}</td>
+                <td>
+                <button>Edit</button>
+                <button>Delete</button>
+                </td>
+                </tr>
+                `
+            });
+
+            htmlContent += `</table`
+
+            document.getElementById('content').innerHTML = htmlContent;
+        }
+
+        function getMessages() {
+            var oReq = new XMLHttpRequest();
+            oReq.addEventListener("load", reqListener);
+            oReq.open("GET", "/messages");
+            oReq.send();
+        }
+
+        getMessages();
+    </script>
 </div>
+
 </html>
