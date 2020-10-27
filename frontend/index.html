@@ -160,10 +160,10 @@
                 let result = await fetch(url).then(result => result.json());
 
                 
-                inputName.setAttribute('value', result.name)
-                inputSubject.setAttribute('value', result.subject);
-                inputMessage.innerText = result.message;
-                inputId.setAttribute('value',id);
+                inputName.value  = result.name
+                inputSubject.value = result.subject;
+                inputMessage.value = result.message;
+                inputId.value = id;
 
             } catch (err) {
                 alert(err);
