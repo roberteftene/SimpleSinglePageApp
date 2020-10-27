@@ -32,11 +32,11 @@
     <form onsubmit="saveMessage(event)">
         <input type="hidden" name="id" id="id" /><br />
         Name:<br />
-        <input type="text" name="name" id="name" /><br />
+        <input type="text" name="name" id="name" required /><br />
         Subject:<br />
-        <input type="text" name="subject" id="subject"><br />
+        <input type="text" name="subject" id="subject" required><br />
         Message:<br />
-        <textarea name="message" id="message"></textarea> <br />
+        <textarea name="message" id="message" required></textarea> <br />
         <input type="submit" value="Save message">
         <input type="reset" value="Cancel">
     </form>
@@ -49,8 +49,9 @@
         async function saveMessage(event) {
 
             event.preventDefault();
-           
+
             let id = event.target.id.value
+        
 
             let data = {
                 name: event.target.name.value,
@@ -61,8 +62,8 @@
             let url = '';
             let method = ''
 
-            if(id) {
-                url = '/message' + id;
+            if (id) {
+                url = `/messages/${id}`;
                 method = 'PUT'
             } else {
                 url = 'messages'
@@ -82,8 +83,9 @@
                 event.target.name.value = ''
                 event.target.subject.value = ''
                 event.target.message.value = ''
+                event.target.id.value = ""
             } catch (err) {
-                console.log(err);   
+                console.log(err);
             }
         }
 
@@ -122,6 +124,51 @@
             } catch (err) {
                 console.log(err)
             }
+        }
+
+        //TODO feature delete message
+
+        async function deleteMessage(id) {
+        
+            try {
+
+                await fetch(`/messages/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        "Content-type": "application/json; charset=UTF-8"
+                    }
+                })
+                showMessages();
+            } catch (err) {
+                console.log(err);
+            }
+
+        }
+        //TODO feature update message
+
+        async function editMessage(id) {
+
+            let inputId = document.getElementById('id');
+            let inputName = document.getElementById('name');
+            let inputSubject = document.getElementById('subject');
+            let inputMessage = document.getElementById('message');
+
+            
+            let url = `/messages/${id}`
+            try {
+
+                let result = await fetch(url).then(result => result.json());
+
+                
+                inputName.setAttribute('value', result.name)
+                inputSubject.setAttribute('value', result.subject);
+                inputMessage.innerText = result.message;
+                inputId.setAttribute('value',id);
+
+            } catch (err) {
+                alert(err);
+            }
+
         }
     </script>
 </div>
