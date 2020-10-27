@@ -9,7 +9,7 @@
     <h1>Messages</h1>
 </body>
 <div id="content">
-    <table style="width:100%;">
+    <table id="tableData" style="width:100%;">
         <tr>
             <th>ID</th>
             <th>Subject</th>
@@ -29,7 +29,7 @@
         </tr>
     </table>
 
-    <form>
+    <form onsubmit="saveMessage(event)">
         <input type="hidden" name="id" id="id" /><br />
         Name:<br />
         <input type="text" name="name" id="name" /><br />
@@ -42,56 +42,87 @@
     </form>
 
     <script type="text/javascript">
-        console.log("Console log javascript")
+        window.onload = () => {
+            showMessages();
+        }
 
+        async function saveMessage(event) {
 
-        function reqListener() {
+            event.preventDefault();
+           
+            let id = event.target.id.value
 
-            console.log(this.responseText);
+            let data = {
+                name: event.target.name.value,
+                subject: event.target.subject.value,
+                message: event.target.message.value
+            }
 
-            let data = JSON.parse(this.responseText);
+            let url = '';
+            let method = ''
 
-            let htmlContent = `
-            
-            <table style="width:100%;">
-            <tr>
-            <th>ID</th>
-            <th>Subject</th>
-            <th>Name</th> 
-            <th>Message</th>
-            <th>Actions</th>
-            </tr>
+            if(id) {
+                url = '/message' + id;
+                method = 'PUT'
+            } else {
+                url = 'messages'
+                method = 'POST'
+            }
 
-            `
+            try {
 
-            data.forEach(element => {
-                htmlContent += `
+                let result = await fetch(url, {
+                    method: method,
+                    body: JSON.stringify(data),
+                    headers: {
+                        "Content-type": "application/json; charset=UTF-8"
+                    }
+                }).then(response => response.json())
+                showMessages();
+                event.target.name.value = ''
+                event.target.subject.value = ''
+                event.target.message.value = ''
+            } catch (err) {
+                console.log(err);   
+            }
+        }
+
+        async function showMessages() {
+            try {
+                let result = await fetch('/messages').then(response => response.json())
+
+                let html = `
+                <table style="width:500px;">
                 <tr>
-                <td>${element.id}</td>
-                <td>${element.subject}</td>
-                <td>${element.name}</td>
-                <td>${element.message}</td>
-                <td>
-                <button>Edit</button>
-                <button>Delete</button>
-                </td>
+                    <th>ID</th>
+                    <th>Subject</th>
+                    <th>Name</th> 
+                    <th>Message</th>
+                    <th>Actions</th>
                 </tr>
                 `
-            });
+                result.forEach(element => {
+                    html += `
+                    <tr>
+                        <td>${element.id}</td>
+                        <td>${element.subject}</td>
+                        <td>${element.name}</td>
+                        <td>${element.message}</td>
+                        <td>
+                            <button onClick="editMessage(${element.id})">Edit</button>
+                            <button onClick="deleteMessage(${element.id})">Delete</button>
+                        </td>
+                    </tr>
+                    `
+                });
 
-            htmlContent += `</table`
+                html += '</table>'
+                document.getElementById('tableData').innerHTML = html;
 
-            document.getElementById('content').innerHTML = htmlContent;
+            } catch (err) {
+                console.log(err)
+            }
         }
-
-        function getMessages() {
-            var oReq = new XMLHttpRequest();
-            oReq.addEventListener("load", reqListener);
-            oReq.open("GET", "/messages");
-            oReq.send();
-        }
-
-        getMessages();
     </script>
 </div>
 
